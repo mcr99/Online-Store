@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #fefcfb;
+  --color-text: #0a1128;
+  --color-secondary: #d3ebf5;
+  --color-button: #034078;
+  --color-textbutton: #fefcfb;
+  --color-lines: #00000045;
+  --color-third: #1282a2;
+
+
+  --color-darkbackground: #0a1128;
+  --color-darktext: #fefcfb;
+}
