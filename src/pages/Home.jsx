@@ -1,8 +1,8 @@
 function Home () {
     return(
-        <>
-        <p>Pagina que se ve al entrar al enlace vista por todos</p>
-        </>
+        <main>
+            <p>Pagina principal que todos tienen acceso</p>
+        </main>
     )
 }
 
