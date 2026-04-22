@@ -6,7 +6,8 @@ function Categories () {
                 <section className="flex flex-col gap-5">
                     <h2>Nombre de la Categoria</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <article className="bg-secondary flex flex-col items-center justify-center rounded-xl shadow p-5 gap-2">
+                        <article className=" flex flex-col items-center justify-center rounded-xl shadow p-5 gap-2 relative">
+                            <p className="absolute top-6 right-6 bg-background text-green-600 rounded-2xl p-1 border-2 text-sm font-bold">Disponible</p>
                             <img src="photo.png" alt="photo"  className="rounded-xl"/>
                             <h3 className="w-full text-start font-bold">Nombre del producto</h3>
                             <p className="w-full text-end font-semibold text-sm">Q20.00</p>

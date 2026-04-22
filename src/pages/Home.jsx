@@ -1,7 +1,7 @@
 function Home () {
     return(
-        <main className="px-5 xl:mx-[10%] my-10">
-            <p>Pagina principal que todos tienen acceso</p>
+        <main className="px-5 xl:mx-[10%] my-10 flex flex-col items-center justify-center">
+            <img src="photo.png" alt="photo" />
         </main>
     )
 }
