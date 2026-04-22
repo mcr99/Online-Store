@@ -36,9 +36,9 @@ function Cart () {
                         <td className="p-2 text-center">Q250.00</td>
                     </tr>
                 </tbody>
-                <tfoot className="border-t">
+                <tfoot className="border-t border-lines">
                     <tr>
-                        <td className="text-center">10</td>
+                        <td className="text-center font-bold">10</td>
                         <td className="hidden sm:block"></td>
                         <td className="text-end font-bold px-5">Total</td>
                         <td className=" text-center font-bold">Q20.00</td>
