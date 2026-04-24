@@ -2,7 +2,7 @@ import { CloudCog, Eye, EyeOff } from "lucide-react"
 import { useContext, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { supabase } from "../libs/supabaseClient"
-import { AuthContext } from "../context/authContext"
+import { AuthContext } from "../context/AuthContext"
 
 function Login () {
     const [eye, SetEye] = useState(true)
@@ -15,10 +15,11 @@ function Login () {
         const {email, password} = Object.fromEntries(formData.entries())
 
         try {
-            const user = await login (email, password)
-            if (user.role === "admin") {
+            const user = await login(email, password)
+            
+            if (user?.role === "admin") {
                 navigate("/dashboard")
-            }else {
+            } else {
                 navigate("/")
             }
         } catch (error){
@@ -52,7 +53,7 @@ function Login () {
                 </label>
                 <button className="bg-button text-textbutton py-3  font-semibold rounded-lg w-full cursor-pointer">Ingresar</button>
                 <section className="border-t border-lines w-full flex flex-col items-center gap-5 pt-10">
-                <p className="text-xs font-bold flex gap-1">No tienes cuenta?<Link className="text-button">Crear Cuenta</Link></p>
+                <p className="text-xs font-bold flex gap-1">No tienes cuenta?<Link to={'/create-account'} className="text-button">Crear Cuenta</Link></p>
             </section>
             </form>
         </main>

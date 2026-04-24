@@ -1,7 +1,7 @@
 import Header from './components/Header'
 import Home from './pages/Home'
 import Login from './pages/Login'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import CreateAccount from './pages/CreateAccount'
 import Orders from './pages/Orders'
 import Cart from './pages/Cart'
@@ -11,22 +11,21 @@ import Users from './pages/Users'
 import { useContext, useEffect, useState } from 'react'
 import Settings from './pages/Settings'
 import Categories from './pages/Categories'
-import { AuthContext, AuthProvider } from './context/authContext'
+import { AuthContext, AuthProvider } from './context/AuthContext'
 import PrivateRoute from './routes/PrivateRoute'
 import AdminDashboard from './pages/AdminDashboard'
 
+
 function App() {
-    const {user, loading} = useContext(AuthContext)
-    const navigate = useNavigate()
+  const { user, loading } = useContext(AuthContext);
 
-    useEffect(() => {
-    const publicPaths = ["#/", "#/login", "#/create-account"];
-    const currentPath = window.location.hash;
-    if (!loading && user?.role === "admin" && publicPaths.includes(currentPath)) {
-        navigate("/dashboard");
+    if (loading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <p className="animate-pulse">Validando credenciales...</p>
+            </div>
+        );
     }
-}, [user, loading, navigate]);
-
 
   return (
     <>
@@ -62,6 +61,7 @@ function App() {
             <Users/>
           </PrivateRoute>
           }></Route>
+         
           <Route path='/dashboard' element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminDashboard/>
