@@ -1,18 +1,68 @@
+import { useEffect, useState } from "react"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { supabase } from "../libs/supabaseClient"
+
+
 function ProductDetails () {
+    const {id} = useParams()
+    const navigate = useNavigate()
+    const [product, setProduct] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [id])
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            const {data, error} = await supabase
+                .from("products")
+                .select("*")
+                .eq("id", id)
+                .single()
+
+                if (error) {
+                    navigate("/")
+                } else {
+                    setProduct(data)
+                }
+                setLoading(false)
+        }
+        fetchProduct()
+    },[id, navigate])
+
+    if (loading) {
+        return <div className="h-screen flex items-center justify-center font-bold">Cargando producto...</div>
+    }
+
+    if (!product) {
+        return <div className="h-screen flex items-center justify-center">Producto no encontrado</div>
+    }
+
     return (
         <main className="px-5 xl:mx-[10%] my-10 flex flex-col items-center justify-center">
             <section>
+                <Link to="/" className="bg-button py-2 px-4 text-textbutton font-semibold rounded-lg">Regresar</Link>
                 <article className=" p-5 grid grid-cols-1 sm:grid-cols-2 items-center justify-center">
-                    <img src="photo.png" alt="photo" />
-                    <div className="sm:p-10 font-semibold flex flex-col sm:gap-5">
-                        <h1>Nombre del producto</h1>
-                        <p>Precio: <span>Q100.00</span></p>
-                        <p>No Disponible</p>
+                    <img src={product.image_url} alt={product.name}  className="rounded-lg max-h-150 my-10"/>
+                    <div className="sm:p-10 font-semibold flex flex-col gap-5">
+                        <h1 className="font-bold text-2xl">{product.name}</h1>
+                        <p className="font-bold">Precio: <span className="font-semibold">Q{product.price}</span></p>
+                        <p>{product.stock > 0 ? "Disponible" : "No Disponible"}</p>
+                        <div className="w-full">
+                            <button className="bg-button text-textbutton w-full p-2 rounded-xl">Agregar</button>
+                            <div className="flex gap-5 justify-center items-center hidden">
+                                <button className="bg-button text-textbutton px-3 font-bold text-2xl rounded flex justify-center items-center"><p className="relative bottom-0.5">-</p></button>
+                                <p className="font-bold text-2xl">1</p>
+                                <button className="bg-button text-textbutton px-2 font-bold text-2xl rounded flex justify-center items-center"><p className="relative bottom-0.5">+</p></button>
+                            </div>
                     </div>
+                    </div>
+                    
                 </article>
                 <article className="p-5 flex flex-col gap-5">
                     <p className="font-bold">Descripcion:</p>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nihil laudantium error quaerat consectetur qui quidem facilis doloribus dicta, nobis eveniet consequuntur illum praesentium iure rerum deleniti. Commodi, soluta atque? Nostrum!</p>
+                    <p className="font-semibold">{product.description}</p>
                 </article>
             </section>
         </main>

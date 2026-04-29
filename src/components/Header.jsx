@@ -20,14 +20,16 @@ function Header() {
                 </Link>
             </div>
             <nav className="hidden sm:flex justify-between gap-5 w-[70%] text-button">
-                <Link to={"/"} className="p-2.5 font-bold hover:text-third w-full text-center">Home</Link>
                 {user?.role === "user" && (
-                        <Link to={"/orders"} className="p-2.5 font-bold hover:text-third w-full text-center">Ordenes</Link>
+                        <>
+                            <Link to={"/"} className="p-2.5 font-bold hover:text-third w-full text-center">Home</Link>
+                            <Link to={"/orders"} className="p-2.5 font-bold hover:text-third w-full text-center">Ordenes</Link>
+                        </>
                     )}
-                <Link to={"/categories"} className="p-2.5 font-bold hover:text-third w-full text-center">Categorias</Link>
 
                 {user?.role === "admin" && (
                         <>
+                            <Link to={"/"} className="p-2.5 font-bold hover:text-third w-full text-center">Home</Link>
                             <Link to={'/dashboard'} className="p-2.5 font-bold hover:text-third w-full text-center">Dashboard</Link>
                         </>
                     )}

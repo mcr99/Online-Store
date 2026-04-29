@@ -157,6 +157,7 @@ function Settings () {
                 <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Datos</button>
             </form>
 
+            {/* 
             <form onSubmit={updateEmail} className="flex flex-col justify-center items-center bg-secondary/40 w-full max-w-100 gap-10 p-5 rounded-2xl shadow-sm">
                 <h2 className="font-bold text-2xl text-center">Cambiar Correo</h2>
                     <label className="w-full flex flex-col gap-2">
@@ -179,6 +180,7 @@ function Settings () {
                 </label>
                 <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Contraseña</button>
             </form>
+            */}
         </main>
     )
 }
