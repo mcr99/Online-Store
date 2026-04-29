@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 
 
 function CreateAccount () {
-    {/* Adjust form */}
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         first_name: '',
@@ -16,6 +15,7 @@ function CreateAccount () {
         email: '',
         password: '',
     })
+    
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })

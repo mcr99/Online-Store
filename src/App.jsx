@@ -51,18 +51,8 @@ function App() {
           }></Route>
 
         {/*Admin */}
-        <Route path='/products' element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <Products/>
-          </PrivateRoute>
-          }></Route>
-        <Route path='/users' element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <Users/>
-          </PrivateRoute>
-          }></Route>
-         
-          <Route path='/dashboard' element={
+          
+          <Route path='/dashboard/*' element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminDashboard/>
           </PrivateRoute>
