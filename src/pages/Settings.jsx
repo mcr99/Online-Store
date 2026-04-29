@@ -1,20 +1,26 @@
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { supabase } from "../libs/supabaseClient"
+import toast from "react-hot-toast"
+import { Eye, EyeOff } from "lucide-react"
 
 function Settings () {
     const { user } = useContext(AuthContext)
-    const [formData, setFormData] = useState({
+    const [loading, setLoading] = useState(true)
+    const [eye, setEye] = useState(true)
+    const [profileData, setProfileData] = useState({
         first_name: '',
         middle_name: '',
         last_name: '',
         second_last_name: '',
         address: '',
         phone_number: '',
+    })
+
+    const [authData, setAuthData] = useState({
         email: '',
         password: '', 
     })
-    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const getProfile = async () => {
@@ -29,19 +35,18 @@ function Settings () {
 
                 if (error) throw error
                 if (data) {
-                    setFormData(prev => ({
-                        ...prev,
+                    setProfileData({
                         first_name: data.first_name || '',
                         middle_name: data.middle_name || '',
                         last_name: data.last_name || '',
                         second_last_name: data.second_last_name || '',
                         address: data.address || '',
                         phone_number: data.phone_number || '',
-                        email: user.email || '',
-                    }))
+                    })
+                    setAuthData(prev => ({...prev, email: user.email || ""}))
                 }
             } catch (error) {
-                console.error("Error cargando perfil:", error.message)
+                toast.error("Error al cargar perfil")
             } finally {
                 setLoading(false)
             }
@@ -50,94 +55,129 @@ function Settings () {
         getProfile()
     }, [user])
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
+    const handleProfileChange = (e) => {
+        setProfileData({
+            ...profileData,
             [e.target.name]: e.target.value
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleAuthChange = (e) => {
+        setAuthData({...authData, [e.target.name]: e.target.value})
+    }
+
+    const updateProfile = async (e) => {
         e.preventDefault()
+        const load = toast.loading("Actualizando Perfil")
         try {
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({
-                    first_name: formData.first_name,
-                    middle_name: formData.middle_name,
-                    last_name: formData.last_name,
-                    second_last_name: formData.second_last_name,
-                    address: formData.address,
-                    phone_number: formData.phone_number,
-                })
-                .eq('id', user.id)
+            const {error} = await supabase
+            .from("profiles")
+            .update(profileData)
+            .eq("id", user.id)
+            if(error) throw error
+            toast.success("Perfil actualizado", {id: load})
+        } catch (error){
+            toast.error(error.message, {id: load})
+        }
+    }
 
-            if (profileError) throw profileError
+    const updateEmail = async (e) => {
+        e.preventDefault()
+        if (authData.email === user.email) return toast.error("El correo es el mismo")
+        
+        try {
+            console.log("Iniciando cambio de email a:", authData.email)
+            const response = await supabase.auth.updateUser({ email: authData.email })
+            console.log("Respuesta email:", response)
 
-            const updateData = {}
-            if (formData.email !== user.email) updateData.email = formData.email
-            if (formData.password.length > 0) {
-                if (formData.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres")
-                updateData.password = formData.password
+            if (response.error) {
+                toast.error(response.error.message)
+            } else {
+                toast.success("Correo actualizado. ¡Revisa tu bandeja!")
             }
-
-            if (Object.keys(updateData).length > 0) {
-                const { error: authError } = await supabase.auth.updateUser(updateData)
-                if (authError) throw authError
-                if (updateData.email) alert("Se ha enviado un correo de confirmación a tu nueva dirección.")
-            }
-
-            alert("¡Perfil actualizado con éxito!")
-            setFormData(prev => ({...prev, password: ''}))
         } catch (error) {
-            alert("Error al actualizar: " + error.message)
+            console.error("Error catch email:", error)
+            toast.error("Error de conexión")
+        }
+    }
+
+    const updatePassword = async (e) => {
+        e.preventDefault()
+        if (authData.password.length < 6) return toast.error("Mínimo 6 caracteres")
+
+        try {
+            console.log("Iniciando cambio de pass...")
+            const response = await supabase.auth.updateUser({ password: authData.password })
+            console.log("Respuesta pass:", response)
+
+            if (response.error) {
+                toast.error(response.error.message)
+            } else {
+                toast.success("Contraseña actualizada con éxito")
+                setAuthData(prev => ({ ...prev, password: "" }))
+            }
+        } catch (error) {
+            console.error("Error catch pass:", error)
+            toast.error("Error al actualizar")
         }
     }
 
     if (loading) return <p className="text-center my-10">Cargando datos...</p>
 
     return(
-        <main className="flex flex-col items-center justify-center px-5 my-10">
-            <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center bg-secondary/40 w-full max-w-100 gap-10 p-5 rounded-2xl shadow-sm">
-                <h1 className="font-bold text-2xl">Actualizar Datos</h1>
+        <main className="flex flex-col items-center justify-center px-5 my-10 gap-10">
+            <h1 className="font-bold text-2xl">Configuracion de Cuenta </h1>
+
+            <form onSubmit={updateProfile} className="flex flex-col justify-center items-center bg-secondary/40 w-full max-w-100 gap-10 p-5 rounded-2xl shadow-sm">
+                <h2 className="font-bold text-2xl text-center">Informacion de Contacto</h2>
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Primer Nombre</p>
-                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="first_name" value={formData.first_name} onChange={handleChange}/>
+                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="first_name" value={profileData.first_name} onChange={handleProfileChange}/>
                 </label>
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Segundo Nombre</p>
-                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="middle_name" value={formData.middle_name} onChange={handleChange}/>
+                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="middle_name" value={profileData.middle_name} onChange={handleProfileChange}/>
                 </label>
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Primer Apellido</p>
-                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="last_name" value={formData.last_name} onChange={handleChange}/>
+                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="last_name" value={profileData.last_name} onChange={handleProfileChange}/>
                 </label>
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Segundo Apellido</p>
-                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="second_last_name"  value={formData.second_last_name} onChange={handleChange}/>
+                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="second_last_name"  value={profileData.second_last_name} onChange={handleProfileChange}/>
                 </label>
-                
-
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Direccion de entrega</p>
-                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="address" value={formData.address} onChange={handleChange}/>
+                    <input type="text" className="border p-3 rounded-lg w-full font-semibold border-lines" name="address" value={profileData.address} onChange={handleProfileChange}/>
                 </label>
                 <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Numero de Telefono</p>
-                    <input type="tel" className="border p-3 rounded-lg w-full font-semibold border-lines" name="phone_number" value={formData.phone_number} onChange={handleChange}/>
+                    <input type="tel" className="border p-3 rounded-lg w-full font-semibold border-lines" name="phone_number" value={profileData.phone_number} onChange={handleProfileChange}/>
                 </label>
-                {/*
+                <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Datos</button>
+            </form>
+
+            <form onSubmit={updateEmail} className="flex flex-col justify-center items-center bg-secondary/40 w-full max-w-100 gap-10 p-5 rounded-2xl shadow-sm">
+                <h2 className="font-bold text-2xl text-center">Cambiar Correo</h2>
                     <label className="w-full flex flex-col gap-2">
                     <p className="font-bold text-sm">Correo Electronico</p>
-                    <input type="email" className="border p-3 rounded-lg w-full font-semibold border-lines" name="email" value={formData.email} onChange={handleChange}/>
+                    <input type="email" className="border p-3 rounded-lg w-full font-semibold border-lines" name="email" value={authData.email} onChange={handleAuthChange}/>
                 </label>
-                <label className="w-full flex flex-col gap-2">
-                    <p className="font-bold text-sm">Contraseña</p>
-                    <input type="password" className="border p-3 rounded-lg w-full font-semibold border-lines" name="password" value={formData.password} onChange={handleChange}/>
-                </label>
-                */}
+                <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Correo</button>
+            </form>
                 
-                <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Datos</button>
+            <form onSubmit={updatePassword} className="flex flex-col justify-center items-center bg-secondary/40 w-full max-w-100 gap-10 p-5 rounded-2xl shadow-sm">
+                <h2 className="font-bold text-2xl text-center">Cambiar Contraseña</h2>
+                <label className="w-full flex flex-col gap-2 justify-center">
+                    <p className="flex justify-between font-bold text-sm">Contraseña</p>
+                    <div className="flex items-center justify-between border py-3 pl-3 rounded-lg  w-full gap-5 border-lines">
+                        <input type={eye ? "password" : "text"} placeholder="*******" className="font-semibold min-w-0 outline-none " name="password" onChange={handleAuthChange} value={authData.password}/>
+                        <button type="button" className="w-11 cursor-pointer text-lines" onClick={()=>setEye(!eye)} >
+                            {eye ? <Eye  /> : <EyeOff/>}
+                        </button>
+                    </div>
+                </label>
+                <button className="bg-button w-full p-3 rounded-xl text-textbutton font-bold">Actualizar Contraseña</button>
             </form>
         </main>
     )

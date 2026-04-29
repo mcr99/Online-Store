@@ -5,7 +5,7 @@ import { supabase } from "../libs/supabaseClient"
 import { AuthContext } from "../context/AuthContext"
 
 function Login () {
-    const [eye, SetEye] = useState(true)
+    const [eye, setEye] = useState(true)
     const {login} = useContext(AuthContext)
     const navigate = useNavigate()
 
@@ -46,7 +46,7 @@ function Login () {
                     <p className="flex justify-between font-bold"><span className="text-sm"> Contraseña</span> <Link className="text-xs cursor-pointer text-button">Recuperar Contraseña?</Link></p>
                     <div className="flex items-center justify-between border py-3 pl-3 rounded-lg  w-full gap-5 border-lines">
                         <input type={eye ? "password" : "text"} placeholder="*******" className="font-semibold min-w-0 outline-none " name="password"/>
-                        <button type="button" className="w-11 cursor-pointer text-lines" onClick={()=>SetEye(!eye)} >
+                        <button type="button" className="w-11 cursor-pointer text-lines" onClick={()=>setEye(!eye)} >
                             {eye ? <Eye  /> : <EyeOff/>}
                         </button>
                     </div>

@@ -14,6 +14,7 @@ import Categories from './pages/Categories'
 import { AuthContext, AuthProvider } from './context/AuthContext'
 import PrivateRoute from './routes/PrivateRoute'
 import AdminDashboard from './pages/AdminDashboard'
+import { Toaster } from 'react-hot-toast'
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
 
   return (
     <>
+    <Toaster position='top-center' reverseOrder={false}></Toaster>
       <Header/>
       <Routes>
         {/*All */}
