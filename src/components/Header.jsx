@@ -2,12 +2,14 @@ import { LogIn, LogOut, Menu, Settings, ShoppingCart } from "lucide-react"
 import { useContext, useState } from "react"
 import { Link } from "react-router-dom"
 import { AuthContext } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
 
 
 
 function Header() {
     const [hamburguerMenu, setHamburgerMenu] = useState(true)
     const {user, logout} = useContext(AuthContext)
+    const {totalItems} = useCart()
 
 
     return(
@@ -40,7 +42,7 @@ function Header() {
                 {user?.role === "user" && (
                         <Link to={"/cart"} className="relative">
                             <div className="bg-button px-1.5 absolute top-0 right-0 rounded-full">
-                                <p className="text-xs font-semibold text-textbutton">1</p>
+                                <p className="text-xs font-semibold text-textbutton">{totalItems}</p>
                             </div>
                             <ShoppingCart className="w-11 h-11 p-2 hover:text-third" />
                         </Link>
@@ -68,7 +70,7 @@ function Header() {
             {user?.role === "user" && (
                         <Link to={"/orders"} className="p-2.5 font-bold hover:text-textbutton hover:bg-button w-full text-center">Ordenes</Link>
                     )}
-            <Link to={"/categories"} className="p-2.5 font-bold hover:text-textbutton hover:bg-button w-full text-center">Categorias</Link>
+
             {user?.role === "admin" && (
                         <>
                             <Link to={'/dashboard'} className="p-2.5 font-bold hover:text-textbutton hover:bg-button w-full text-center">Dashboard</Link>

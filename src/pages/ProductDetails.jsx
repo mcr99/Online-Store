@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../libs/supabaseClient"
+import { useCart } from "../context/CartContext"
+import toast from "react-hot-toast"
 
 
 function ProductDetails () {
     const {id} = useParams()
+    const { addToCart, cart, removeFromCart } = useCart()
     const navigate = useNavigate()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -31,6 +34,9 @@ function ProductDetails () {
         fetchProduct()
     },[id, navigate])
 
+    const itemInCart = cart.find((item) => item.id === product?.id)
+    const quantity = itemInCart ? itemInCart.quantity : 0
+
     if (loading) {
         return <div className="h-screen flex items-center justify-center font-bold">Cargando producto...</div>
     }
@@ -50,15 +56,30 @@ function ProductDetails () {
                         <p className="font-bold">Precio: <span className="font-semibold">Q{product.price}</span></p>
                         <p>{product.stock > 0 ? "Disponible" : "No Disponible"}</p>
                         <div className="w-full">
-                            <button className="bg-button text-textbutton w-full p-2 rounded-xl">Agregar</button>
-                            <div className="flex gap-5 justify-center items-center hidden">
-                                <button className="bg-button text-textbutton px-3 font-bold text-2xl rounded flex justify-center items-center"><p className="relative bottom-0.5">-</p></button>
-                                <p className="font-bold text-2xl">1</p>
-                                <button className="bg-button text-textbutton px-2 font-bold text-2xl rounded flex justify-center items-center"><p className="relative bottom-0.5">+</p></button>
-                            </div>
+                            {quantity === 0 ? (
+                                <button onClick={() => {
+                                addToCart(product)
+                                toast.success(`${product.name} agregado!`)
+                            }} className="text-center bg-button text-textbutton w-full p-2 rounded-xl" >Agregar</button>
+                            ):(
+                                <div className="flex gap-5 justify-center items-center">
+                                    <button className="bg-button text-textbutton px-3 font-bold text-2xl rounded flex justify-center items-center" onClick={()=> {
+                                        removeFromCart(product.id)
+                                        toast.success(`${product.name} retirado!`)
+                                    }}>
+                                        <p className="relative bottom-0.5">-</p>
+                                    </button>
+                                    <p className="font-bold text-2xl">{quantity}</p>
+                                    <button className="bg-button text-textbutton px-2 font-bold text-2xl rounded flex justify-center items-center" onClick={()=> {
+                                        addToCart(product)
+                                        toast.success(`${product.name} agregado!`)
+                                    }}>
+                                        <p className="relative bottom-0.5">+</p>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    </div>
-                    
                 </article>
                 <article className="p-5 flex flex-col gap-5">
                     <p className="font-bold">Descripcion:</p>
