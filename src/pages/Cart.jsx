@@ -1,7 +1,42 @@
+import { useContext } from "react";
 import { useCart } from "../context/CartContext"
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../libs/supabaseClient";
+import toast from "react-hot-toast";
 
 function Cart () {
     const { cart, removeFromCart, totalPrice,  clearCart, totalItems } = useCart() 
+    const { user } = useContext(AuthContext)
+
+    const handleCheckout = async () => {
+        try {
+            const {data: order, error: orderError} = await supabase
+                .from("orders")
+                .insert([{user_id: user.id, status: "pending"}])
+                .select()
+                .single()
+            
+            if(orderError) throw orderError
+
+            const orderItems = cart.map(item => ({
+                order_id: order.id,
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price,
+            }))
+
+            const { error: itemsError } = await supabase
+                .from("order_items")
+                .insert(orderItems)
+
+            if(itemsError) throw itemsError
+
+            await clearCart()
+            toast.success("Compra Realizada")
+        } catch (error) {
+            toast.error("Error al procesar la compra")
+        }
+    }
 
     if (cart.length === 0) return <p className="text-center my-20">El carrito está vacío</p>;
     return(

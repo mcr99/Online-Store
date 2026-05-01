@@ -35,20 +35,17 @@ function Home () {
                             {quantity === 0 ? (
                                 <button onClick={()=> {
                                 addToCart(product)
-                                toast.success(`${product.name} agregado!`)
                                 }} className={`text-center bg-button text-textbutton w-full p-2 rounded-xl`}>Agregar</button>
                             ): (
                                 <div className={`flex gap-5 justify-center items-center`}>
                                     <button onClick={()=> {
                                         removeFromCart(product.id)
-                                        toast.success(`${product.name} retirado!`)
                                     } } className="bg-button text-textbutton px-3 font-bold text-2xl rounded flex justify-center items-center">
                                         <p className="relative bottom-0.5">-</p>
                                     </button>
                                     <p className="font-bold text-2xl">{quantity}</p>
                                     <button onClick={() => {
                                         addToCart(product)
-                                        toast.success(`${product.name} agregado!`)
                                     }} className="bg-button text-textbutton px-2 font-bold text-2xl rounded flex justify-center items-center">
                                         <p className="relative bottom-0.5">+</p>
                                     </button>

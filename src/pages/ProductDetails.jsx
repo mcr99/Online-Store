@@ -59,20 +59,17 @@ function ProductDetails () {
                             {quantity === 0 ? (
                                 <button onClick={() => {
                                 addToCart(product)
-                                toast.success(`${product.name} agregado!`)
                             }} className="text-center bg-button text-textbutton w-full p-2 rounded-xl" >Agregar</button>
                             ):(
                                 <div className="flex gap-5 justify-center items-center">
                                     <button className="bg-button text-textbutton px-3 font-bold text-2xl rounded flex justify-center items-center" onClick={()=> {
                                         removeFromCart(product.id)
-                                        toast.success(`${product.name} retirado!`)
                                     }}>
                                         <p className="relative bottom-0.5">-</p>
                                     </button>
                                     <p className="font-bold text-2xl">{quantity}</p>
                                     <button className="bg-button text-textbutton px-2 font-bold text-2xl rounded flex justify-center items-center" onClick={()=> {
                                         addToCart(product)
-                                        toast.success(`${product.name} agregado!`)
                                     }}>
                                         <p className="relative bottom-0.5">+</p>
                                     </button>
