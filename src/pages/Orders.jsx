@@ -6,6 +6,8 @@ import toast from "react-hot-toast"
 function Orders () {
     const [myOrders, setMyOrders] = useState([])
     const [loading, setLoading] = useState(true)
+    const [selectedOrder, setSelectedOrder] = useState(null)
+    const [modalOpen, setModalOpen] = useState(false)
 
     const { user } = useContext(AuthContext)
 
@@ -18,7 +20,8 @@ function Orders () {
                     *,
                     order_items (
                         quantity,
-                        unit_price
+                        unit_price,
+                        products (name)
                     )
                     `)
                 .eq("user_id", user.id)
@@ -32,6 +35,8 @@ function Orders () {
             setLoading(false)
         }
     }
+
+    
 
     useEffect(() => {
         if (user) {
@@ -54,7 +59,10 @@ function Orders () {
                             return acc + (Number(item.quantity || 0) * Number(item.unit_price || 0 ))
                         }, 0)
                         return(
-                            <article className="w-full shadow-lg rounded-lg p-5 flex flex-col " key={order.id}>
+                            <article onClick={() => {
+                                setSelectedOrder(order)
+                                setModalOpen(true)
+                            }} className="w-full shadow-lg rounded-lg p-5 flex flex-col " key={order.id}>
                                 <div className="flex justify-between items-center mb-5 gap-5">
                                     <p className="font-bold text-lg ">Orden #<span>{order.id.toString().slice(0,5)}</span></p>
                                     <p className={`${order.status === "pending" ? "text-red-700" : "text-green-700"} font-bold text-xs border-2 p-1 rounded-2xl `}>{order.status === "pending" ? "Pendiente" : "Completado"}</p>
@@ -67,6 +75,35 @@ function Orders () {
                     }))}
                 
             </section>
+            {modalOpen && selectedOrder && (
+                <div className="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+                        <div className="p-5 border-b flex justify-between items-center">
+                            <h2 className="font-bold text-lg">Productos de la Orden</h2>
+                            <button onClick={() => setModalOpen(false)} className="text-gray-500 text-xl font-bold">✕</button>
+                        </div>
+                        
+                        <div className="p-5 max-h-[60vh] overflow-y-auto">
+                            {selectedOrder.order_items.map((item, id) => (
+                                <div key={id} className="flex justify-between items-center mb-4 last:mb-0 pb-2">
+                                    <div>
+                                        <p className="font-bold text-gray-800">{item.products.name}</p>
+                                        <p className="text-xs text-gray-500">Cantidad: {item.quantity}</p>
+                                    </div>
+                                    <p className="font-semibold text-sm">Q{(item.quantity * item.unit_price).toFixed(2)}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="p-5 bg-gray-50 flex justify-between items-center">
+                            <span className="font-bold">Total:</span>
+                            <span className="text-xl font-black text-blue-600">
+                                Q{selectedOrder.order_items.reduce((acc, i) => acc + (i.quantity * i.unit_price), 0).toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }
